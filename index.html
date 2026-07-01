@@ -8,7 +8,7 @@
   <style>
     body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; }
     .app-container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
+    input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
     .punch-btn { width: 100%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
     .punch-in { background: #2ecc71; }
     .punch-out { background: #e74c3c; }
@@ -40,9 +40,16 @@
 
     async function submitPunch(action) {
       const status = document.getElementById('status');
-      status.innerText = "Processing...";
+      status.innerText = "Getting location...";
       
+      // Check if browser supports Geolocation
+      if (!navigator.geolocation) {
+        status.innerText = "Error: Geolocation not supported.";
+        return;
+      }
+
       navigator.geolocation.getCurrentPosition(async (pos) => {
+        status.innerText = "Processing...";
         const payload = {
           empId: document.getElementById('empId').value,
           name: document.getElementById('empName').value,
@@ -64,6 +71,8 @@
         } catch (e) {
           status.innerText = "Error: " + e.message;
         }
+      }, (err) => {
+        status.innerText = "Error: Please allow location access to punch.";
       });
     }
 
